@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="game-board">
+        <div class="pit-row" id="player-row">
+          <div class="pit" onclick="makeMove(0)"></div>
+          <div class="pit" onclick="makeMove(1)"></div>
+          <div class="pit" onclick="makeMove(2)"></div>
+          <div class="pit" onclick="makeMove(3)"></div>
+          <div class="pit" onclick="makeMove(4)"></div>
+          <div class="pit" onclick="makeMove(5)"></div>
+          <div class="store" id="player-store">0</div>
+        </div>
+        <div class="pit-row" id="opponent-row">
+          <div class="pit" onclick="makeMove(11)"></div>
+          <div class="pit" onclick="makeMove(10)"></div>
+          <div class="pit" onclick="makeMove(9)"></div>
+          <div class="pit" onclick="makeMove(8)"></div>
+          <div class="pit" onclick="makeMove(7)"></div>
+          <div class="pit" onclick="makeMove(6)"></div>
+          <div class="store" id="opponent-store">0</div>
+        </div>
+      </div>
+</body>
+<style>
+    .game-board {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+}
+
+.pit-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pit {
+  width: 50px;
+  height: 50px;
+  background-color: #e9e9e9;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.store {
+  width: 70px;
+  height: 70px;
+  background-color: #e9e9e9;
+  text-align: center;
+  line-height: 70px;
+  font-weight: bold;
+}
+</style>
+<script>
+    let playerRow = document.getElementById("player-row");
+let opponentRow = document.getElementById("opponent-row");
+let playerStore = document.getElementById("player-store");
+let opponentStore = document.getElementById("opponent-store");
+
+let gameBoard = [4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0];
+let currentPlayer = "player";
+
+function makeMove(index) {
+  if (currentPlayer === "opponent" || gameBoard[index] === 0) {
+    return;
+  }
+  
+  let stones = gameBoard[index];
+  gameBoard[index] = 0;
+  
+  let currentRow = currentPlayer === "player" ? playerRow : opponentRow;
+  let currentPit = currentRow.getElementsByClassName("pit")[index];
+  
+  for (let i = 0; i < stones; i++) {
+    index = (index + 1) % 14;
+    if (currentPlayer === "player" && index === 13) {
+      continue;
+    }
+    if (currentPlayer === "opponent" && index === 6) {
+      continue;
+    }
+    gameBoard[index]++;
+    setTimeout(() => {
+      let currentRow = currentPlayer === "player" ? playerRow : opponentRow;
+      let currentPit = currentRow.getElementsByClassName("pit")[index];
+      currentPit.innerText = gameBoard[index];
+    }, (i + 1) * 300);
+  }
+  
+  if (index !== 13 && currentPlayer === "player") {
+    currentPlayer = "opponent";
+    setTimeout(opponentTurn, (stones + 1) * 300);
+  } else {
+    currentPlayer = "player";
+  }
+  
+  updateStores();
+}
+
+function opponentTurn() {
+  let validMoves = [6, 7, 8, 9, 10, 11];
+  let randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+  makeMove(randomMove);
+}
+
+function updateStores() {
+  playerStore.innerText = gameBoard[6];
+  opponentStore.innerText = gameBoard[13];
+}
+
+function initializeBoard() {
+  let pits = document.getElementsByClassName("pit");
+  for (let i = 0; i < pits.length; i++) {
+    pits[i].innerText = gameBoard[i];
+  }
+  updateStores();
+}
+
+initializeBoard();
+</script>
+</html>
